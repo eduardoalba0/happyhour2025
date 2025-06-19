@@ -1,0 +1,101 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+
+      xmlns:ui="jakarta.faces.facelets">
+<h:body>
+    <ui:composition
+            template="/templates/modelo.xhtml">
+
+        <ui:define name="conteudo">
+            <h:form id="formCadastro" >
+                <p:fieldset toggleable="true" toggleSpeed="750" legend="Cadastro"
+                            collapsed="#{estadoBean.collapsed}">
+                    <p:ajax event="toggle" listener="#{estadoBean.novo}"
+                            update=":formCadastro">
+                        <f:actionListener
+                                type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                    </p:ajax>
+                    <p:panel id="painelBasico" update=":mensagem">
+
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">                            <h:outputText value="Pais*" for="pais"/>
+                            <p:selectOneMenu style="width: 100%" id="comboPais" value="#{estadoBean.estado.pais}"
+                                             converter="omnifaces.SelectItemsConverter" required="true"
+                                             requiredMessage="Selecione um País.">
+                                <f:selectItem itemLabel="Selecione..." itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems itemLabel="#{pais.nome}" itemValue="#{pais}"
+                                               value="#{paisBean.paises}" var="pais"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Estado*" for="nome"/>
+                            <p:inputText id="nome" value="#{estadoBean.estado.nome}"
+                                         required="true" requiredMessage="Insira o nome do estado."
+                                         size="30" maxlength="30"/>
+                            <h:outputText value="Sigla*" for="sigla"/>
+                            <p:inputText id="sigla" value="#{estadoBean.estado.sigla}"
+                                         required="true" requiredMessage="Insira a sigla do Estado"
+                                         size="3" maxlength="3"/>
+                        </p:panelGrid>
+                        <f:facet name="footer">
+                            <p:commandButton value="Salvar" action="#{estadoBean.salvar}"
+                                             update=":mensagem :formEstado:tabela :formCadastro"/>
+                        </f:facet>
+                    </p:panel>
+                </p:fieldset>
+            </h:form>
+            <h:form id="formEstado" >
+                <p:panel header="Registro de Estados">
+                    <p:dataTable id="tabela" stripedRows="true" showGridlines="true" widgetVar="tabEstados"
+                                 emptyMessage="Não há registros." paginator="true" rows="7"
+                                 paginatorPosition="bottom" value="#{estadoBean.estados}"
+                                 var="estado">
+                        <f:facet name="header">
+                            <p:inputText id="globalFilter" placeholder="Pesquise..."
+                                         onkeyup="PF('tabEstados').filter()"/>
+                        </f:facet>
+                        <p:column headerText="Nome" style="width:40%"
+                                  sortBy="#{estado.nome}" filterBy="#{estado.nome}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{estado.nome}"/>
+                        </p:column>
+                        <p:column headerText="Sigla" style="width:10%"
+                                  sortBy="#{estado.sigla}" filterBy="#{estado.sigla}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{estado.sigla}"/>
+                        </p:column>
+                        <p:column headerText="País" style="width:40%"
+                                  sortBy="#{estado.pais.nome}" filterBy="#{estado.pais.nome}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{estado.pais.nome}"/>
+                        </p:column>
+                        <p:column headerText="Opções" style="width:10%">
+                            <p:commandButton icon="pi pi-pencil" styleClass="rounded-button ui-button-info ui-button-flat"
+                                             actionListener="#{estadoBean.editar}" update=":formCadastro ">
+                                <f:attribute name="estadoSelecionado" value="#{estado}"/>
+                                <f:actionListener
+                                        type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                            </p:commandButton>
+                            <p:commandButton icon="pi pi-trash" styleClass="rounded-button ui-button-danger ui-button-flat"
+                                             actionListener="#{estadoBean.excluir}"
+                                             update=":mensagem :formEstado:tabela :formCadastro">
+                                <p:confirm header="Confirmação"
+                                           message="Deseja excluir o Estado?" icon="ui-icon-alert"/>
+                                <f:attribute name="estadoSelecionado" value="#{estado}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Sim" type="button"
+                                         styleClass="ui-confirmdialog-yes ui-button-outlined ui-button-danger" icon="pi pi-check"
+                                         update=":mensagem :formEstado:tabela :formCadastro"/>
+                        <p:commandButton value="Não" type="button"
+                                         styleClass="ui-confirmdialog-no ui-button-outlined" icon="pi pi-times"/>
+                    </p:confirmDialog>
+                </p:panel>
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

@@ -1,0 +1,88 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+
+      xmlns:ui="jakarta.faces.facelets">
+<h:body>
+    <ui:composition
+            template="/templates/modelo.xhtml">
+
+        <ui:define name="conteudo">
+            <h:form id="formCadastro" >
+                <p:fieldset toggleable="true" toggleSpeed="750" legend="Cadastro"
+                            collapsed="#{servicoBean.collapsed}">
+                    <p:ajax process="@this" event="toggle"
+                            listener="#{servicoBean.novo}" update=":formCadastro">
+                        <f:actionListener
+                                type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                    </p:ajax>
+                    <p:panel id="painelBasico">
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">
+
+                            <h:outputText value="Nome do servico" for="nome"/>
+                            <p:inputText id="nome" value="#{servicoBean.servico.descricao}"
+                                         required="true" requiredMessage="Insira o nome do servico."
+                                         size="30" maxlength="30"/>
+                            <h:outputText value="Preço" for="valor"/>
+                            <p:inputNumber id="valor" value="#{servicoBean.servico.valor}"
+                                           maxlength="8" size="8" required="true"
+                                           requiredMessage="Informe o preço." decimalPlaces="2"
+                                           decimalSeparator="," thousandSeparator="." symbol="R$ "/>
+                        </p:panelGrid>
+                        <f:facet name="footer">
+                            <p:commandButton value="Salvar" action="#{servicoBean.salvar}"
+                                             update=":mensagem :formServico:tabela :formCadastro"/>
+                        </f:facet>
+                    </p:panel>
+                </p:fieldset>
+            </h:form>
+            <h:form id="formServico" >
+                <p:panel header="Registro de Serviços">
+                    <p:dataTable id="tabela" stripedRows="true" showGridlines="true" widgetVar="tabServicos"
+                                 emptyMessage="Não há registros." paginator="true" rows="7"
+                                 paginatorPosition="bottom" value="#{servicoBean.servicos}"
+                                 var="servico">
+                        <f:facet name="header">
+                            <p:inputText id="globalFilter" placeholder="Pesquise..."
+                                         onkeyup="PF('tabServicos').filter()"/>
+                        </f:facet>
+                        <p:column headerText="Serviço" style="width:50%"
+                                  sortBy="#{servico.descricao}" filterBy="#{servico.descricao}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{servico.descricao}"/>
+                        </p:column>
+                        <p:column headerText="Preço" style="width:40%"
+                                  sortBy="#{servico.valor}" filterBy="#{servico.valor}"
+                                  filterStyle="display:none">
+                            <h:outputText value="R$ #{servico.valor}"/>
+                        </p:column>
+                        <p:column headerText="Opções" style="width:10%">
+                            <p:commandButton icon="pi pi-pencil" styleClass="rounded-button ui-button-info ui-button-flat"
+                                             actionListener="#{servicoBean.editar}" update=":formCadastro">
+                                <f:attribute name="servicoSelecionado" value="#{servico}"/>
+                                <f:actionListener
+                                        type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                            </p:commandButton>
+                            <p:commandButton icon="pi pi-trash" styleClass="rounded-button ui-button-danger ui-button-flat"
+                                             actionListener="#{servicoBean.excluir}"
+                                             update=":mensagem :formServico:tabela :formCadastro">
+                                <p:confirm header="Confirmação"
+                                           message="Deseja excluir o Servico?" icon="ui-icon-alert"/>
+                                <f:attribute name="servicoSelecionado" value="#{servico}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Sim" type="button"
+                                         styleClass="ui-confirmdialog-yes ui-button-outlined ui-button-danger" icon="pi pi-check"
+                                         update=":mensagem :formServico:tabela :formCadastro"/>
+                        <p:commandButton value="Não" type="button"
+                                         styleClass="ui-confirmdialog-no ui-button-outlined" icon="pi pi-times"/>
+                    </p:confirmDialog>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

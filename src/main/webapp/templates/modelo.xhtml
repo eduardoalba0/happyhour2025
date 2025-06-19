@@ -1,0 +1,116 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="jakarta.faces.facelets">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>HappyHour</title>
+	<link rel="stylesheet" type="text/css"
+		href="#{request.contextPath}/resources/css/main.css" />
+</h:head>
+<h:body>
+	<p:growl id="mensagem" />
+	<div id="geral">
+		<div id="cabecalho">
+			<h:form id="formBar">
+				<p:menubar>
+					<p:menuitem value="HappyHour"
+						style="font-family:amarillo; font-size: 16px;" url="#{request.contextPath}/pages/index.xhtml" />
+					<p:submenu label="Acompanhamento" icon="ui-icon-info">
+						<p:menuitem value="Registro de Clientes" url="#{request.contextPath}/pages/clientes.xhtml"
+							 />
+						<p:menuitem value="Eventos cadastrados" url="#{request.contextPath}/pages/eventos.xhtml" />
+						<p:menuitem value="Locais disponíveis" url="#{request.contextPath}/pages/locais.xhtml"
+							 />
+					</p:submenu>
+					<p:submenu label="Gerenciamento" icon="ui-icon-gear"
+						>
+						<p:menuitem value="Locais conveniados" url="#{request.contextPath}/pages/locais.xhtml" />
+						<p:menuitem value="Serviços oferecidos" url="#{request.contextPath}/pages/servicos.xhtml" />
+						<p:menuitem value="Usuários habilitados" url="#{request.contextPath}/pages/usuarios.xhtml" />
+						<p:separator />
+						<p:menuitem value="Cidades cadastradas" url="#{request.contextPath}/pages/cidades.xhtml" />
+						<p:menuitem value="Estados cadastrados" url="#{request.contextPath}/pages/estados.xhtml" />
+						<p:menuitem value="Paises cadastrados" url="#{request.contextPath}/pages/paises.xhtml" />
+					</p:submenu>
+					<f:facet name="options">
+						<p:commandButton value="Entrar"
+							rendered="#{loginBean.usuarioLogado == null}"
+							action="#{loginBean.novo}" oncomplete="PF('barraLogin').show()">
+							<f:actionListener
+								type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+						</p:commandButton>
+						<p:commandButton value="Sair"
+							rendered="#{loginBean.usuarioLogado != null}"
+							action="#{loginBean.sair}" process="@this"
+							oncomplete="window.location.replace('index.xhtml');">
+							<f:actionListener
+								type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+						</p:commandButton>
+					</f:facet>
+				</p:menubar>
+			</h:form>
+		</div>
+		<h:form id="formServicosEvt">
+			<p:dialog widgetVar="relatorioServicosEvt" draggable="false"
+				resizable="false" modal="true" closable="true" closeOnEscape="true"
+				showEffect="explode" hideEffect="explode" position="center"
+				width="30%">
+				<p:panel header="Relatório de Serviços">
+					<p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">                            <h:outputText value="Pais*" for="pais"/>
+						<h:outputText for="evento" />
+						<p:selectOneMenu style="width: 100%" id="evento" value="#{eventoBean.evento}"
+							converter="omnifaces.SelectItemsConverter" filter="true"
+							required="true" requiredMessage="Selecione um evento.">
+							<f:selectItem itemLabel="Selecione um evento..."
+								noSelectionOption="" />
+							<f:selectItems itemValue="#{evento}" var="evento"
+								itemLabel="#{evento.descricao}" value="#{eventoBean.eventos}" />
+						</p:selectOneMenu>
+					</p:panelGrid>
+					</p:panel>
+			</p:dialog>
+		</h:form>
+		<br />
+		<p:sidebar position="left" widgetVar="barraLogin" baseZIndex="0"
+			blockScroll="true">
+			<h:form id="formLogin" style="text-align: center;">
+				<p:panel header="Login">
+					<p:panelGrid columns="1"
+						style="margin-left:auto; margin-right:auto;">
+						<h:outputText value="Usuario*" for="loginUsuario" />
+						<p:inputText id="loginUsuario" value="#{loginBean.usuario.nome}"
+							size="20" maxlength="20" required="true"
+							onkeyup="value = value.toLowerCase()"
+							requiredMessage="Insira o nome de usuário.">
+						</p:inputText>
+						<h:outputText value="Senha*" for="senha" />
+						<p:password id="senha" value="#{loginBean.usuario.senha}"
+							size="20" maxlength="12" required="true"
+							requiredMessage="Insira sua senha.">
+						</p:password>
+					</p:panelGrid>
+					<f:facet name="footer">
+						<p:linkButton value="Registro" href="#{request.contextPath}/pages/index.xhtml" style="margin-right: 5px; margin-left: 5px"/>
+						<p:commandButton value="Entrar" action="#{loginBean.entrar}"
+							update=":mensagem :formLogin"  style="margin-right: 5px; margin-left: 5px"
+							oncomplete="if(!args.validationFailed){att()}">
+							<f:actionListener
+								type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" />
+						</p:commandButton>
+						<p:remoteCommand name="att" delay="700"
+							oncomplete="window.location.replace('index.xhtml');" />
+					</f:facet>
+				</p:panel>
+			</h:form>
+		</p:sidebar>
+		<div id="conteudo">
+			<ui:insert name="conteudo" />
+			<br />
+			<h:outputLabel style="font-family: Arial; text-align: center;"
+				value="&#169; Copyright Eduardo Luiz Alba (2019) - Todos os direitos reservados." />
+		</div>
+	</div>
+</h:body>
+</html>

@@ -1,0 +1,19 @@
+@font-face {
+    font-family: 'amarillo';
+    src: url('../fonts/Amarillo.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+thead tr th {
+    text-align: center !important;
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+ .carousel-item .carousel-item-content {
+     border: 1px solid black;
+     border-radius: 3px;
+     margin: .3rem;
+     text-align: center;
+     padding: 2rem 0;
+ }

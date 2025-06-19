@@ -1,0 +1,213 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+
+      xmlns:ui="jakarta.faces.facelets">
+<h:body>
+    <ui:composition
+            template="/templates/modelo.xhtml">
+        <ui:define name="conteudo">
+            <h:form id="formCadastro">
+                <p:fieldset toggleable="true" toggleSpeed="750" legend="Cadastro"
+                            collapsed="#{clienteBean.collapsed}">
+                    <p:ajax event="toggle" listener="#{clienteBean.novo}"
+                            update=":formCadastro">
+                        <f:actionListener
+                                type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                    </p:ajax>
+                    <p:panel id="painelPessoal">
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">                            <h:outputText value="Nome Completo" for="nome"/>
+                            <p:inputText id="nome" value="#{clienteBean.cliente.nome}"
+                                         required="true" requiredMessage="Insira o nome do cliente."
+                                         size="30" maxlength="30">
+                                <f:ajax event="keyup" partialSubmit="true"/>
+                            </p:inputText>
+                            <h:outputText value="Tipo de Pessoa" for="tipo"/>
+                            <p:selectOneMenu style="width: 100%" id="tipo"
+                                             value="#{clienteBean.cliente.tipoPessoa}" required="true"
+                                             requiredMessage="Informe o tipo da pessoa.">
+                                <f:selectItem itemLabel="Selecione..." noSelectionOption="true"/>
+                                <f:selectItem itemLabel="Física" itemValue="Física"/>
+                                <f:selectItem itemLabel="Jurídica" itemValue="Jurídica"/>
+                                <f:ajax event="itemSelect" render=":formCadastro:painelPessoal"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="CPF" for="docCPF"
+                                          rendered="#{clienteBean.cliente.tipoPessoa == 'Física'}"/>
+                            <p:inputMask id="docCPF" mask="999.999.999-99"
+                                         value="#{clienteBean.cliente.documento}" required="true"
+                                         requiredMessage="Insira o número do documento."
+                                         rendered="#{clienteBean.cliente.tipoPessoa == 'Física'}"/>
+                            <h:outputText value="CNPJ" for="docCNPJ"
+                                          rendered="#{clienteBean.cliente.tipoPessoa == 'Jurídica'}"/>
+                            <p:inputMask id="docCNPJ" mask="99.999.999.9999/99"
+                                         value="#{clienteBean.cliente.documento}" required="true"
+                                         requiredMessage="Insira o número do documento."
+                                         rendered="#{clienteBean.cliente.tipoPessoa == 'Jurídica'}"/>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:panel id="painelEndereco">
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">
+
+                            <h:outputText value="Pais" for="comboPais"/>
+                            <p:selectOneMenu style="width: 100%" id="comboPais" value="#{clienteBean.pais}"
+                                             converter="omnifaces.SelectItemsConverter" filter="true">
+                                <f:selectItem itemLabel="Selecione..." itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems itemLabel="#{pais.nome}" itemValue="#{pais}"
+                                               value="#{clienteBean.paises}" var="pais"/>
+                                <f:ajax event="itemSelect"
+                                        listener="#{clienteBean.ajaxFiltraEstados}"
+                                        render="comboEstado comboCidade"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Estado" for="comboEstado"/>
+                            <p:selectOneMenu style="width: 100%" id="comboEstado"
+                                             disabled="#{clienteBean.disEstado}"
+                                             value="#{clienteBean.estado}"
+                                             converter="omnifaces.SelectItemsConverter" filter="true">
+                                <f:selectItem itemLabel="Selecione..." itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems itemLabel="#{estado.nome}" itemValue="#{estado}"
+                                               value="#{clienteBean.estados}" var="estado"/>
+                                <f:ajax event="itemSelect"
+                                        listener="#{clienteBean.ajaxFiltraCidades}"
+                                        render="comboCidade"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Cidade" for="comboCidade"/>
+                            <p:selectOneMenu style="width: 100%" id="comboCidade"
+                                             disabled="#{clienteBean.disCidade}"
+                                             value="#{clienteBean.cliente.endereco.cidade}"
+                                             converter="omnifaces.SelectItemsConverter" required="true"
+                                             requiredMessage="Selecione uma Cidade." filter="true">
+                                <f:selectItem itemLabel="Selecione..." itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems itemLabel="#{cidade.nome}" itemValue="#{cidade}"
+                                               value="#{clienteBean.cidades}" var="cidade"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Logradouro" for="logradouro"/>
+                            <p:inputText id="logradouro"
+                                         value="#{clienteBean.cliente.endereco.logradouro}"
+                                         required="true" size="35" maxlength="40"
+                                         requiredMessage="Insira o Logradouro."/>
+                            <h:outputText value="Número" for="numero"/>
+                            <p:inputText id="numero"
+                                         value="#{clienteBean.cliente.endereco.numero}" required="true"
+                                         requiredMessage="Insira o número." size="6" maxlength="6"
+                                         type="number"/>
+                            <h:outputText value="Bairro" for="bairro"/>
+                            <p:inputText id="bairro"
+                                         value="#{clienteBean.cliente.endereco.bairro}" required="true"
+                                         requiredMessage="Insira o Bairro." size="20" maxlength="20"/>
+                            <h:outputText value="CEP" for="cep"/>
+                            <p:inputMask id="cep"
+                                         value="#{clienteBean.cliente.endereco.cep}" required="true"
+                                         requiredMessage="Insira o CEP." size="10" maxlength="10"
+                                         mask="99999-999"/>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:panel id="painelContato">
+
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">                            <h:outputText value="Telefone:" for="telefone"/>
+                            <p:inputMask id="telefone"
+                                         value="#{clienteBean.cliente.contato.telefone}"
+                                         required="false" size="13" maxlength="13" mask="(99)9999-9999"/>
+                            <h:outputText value="Celular" for="celular"/>
+                            <p:inputMask id="celular"
+                                         value="#{clienteBean.cliente.contato.celular}" required="false"
+                                         size="14" maxlength="14" mask="(99)99999-9999"/>
+                            <h:outputText value="E-mail" for="email"/>
+                            <p:inputText id="email"
+                                         value="#{clienteBean.cliente.contato.email}" size="35"
+                                         maxlength="35"/>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:panel id="painelLogin">
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">                            <h:outputText value="Usuario"/>
+                            <p:inputText value="#{clienteBean.cliente.usuario.nome}"
+                                         size="30" maxlength="15" required="true"
+                                         onkeyup="value = value.toLowerCase()"/>
+                            <h:outputText value="Senha"/>
+                            <p:password value="#{clienteBean.cliente.usuario.senha}"
+                                        size="30" maxlength="12" required="true" redisplay="true"/>
+                            <h:outputText value="Confirmação"/>
+                            <p:password value="#{clienteBean.cliente.usuario.confirmSenha}"
+                                        size="30" maxlength="12" required="true" redisplay="true"/>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:commandButton value="Salvar" action="#{clienteBean.salvar}"
+                                     style="float:right; margin-top:2px;"
+                                     update=":mensagem :formCliente:tabela :formCadastro"/>
+                </p:fieldset>
+            </h:form>
+            <h:form id="formCliente">
+                <p:panel header="Registro de Clientes">
+                    <p:dataTable id="tabela" stripedRows="true" showGridlines="true" widgetVar="tabClientes"
+                                 emptyMessage="Não há registros." paginator="true" rows="7"
+                                 paginatorPosition="bottom" value="#{clienteBean.clientes}"
+                                 var="cliente">
+                        <f:facet name="header">
+                            <p:inputText id="globalFilter" placeholder="Pesquise..."
+                                         onkeyup="PF('tabClientes').filter()"/>
+                        </f:facet>
+                        <p:column headerText="Nome" style="width:30%"
+                                  sortBy="#{cliente.nome}" filterBy="#{cliente.nome}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{cliente.nome}"/>
+                        </p:column>
+                        <p:column headerText="Tipo" style="width:10%"
+                                  sortBy="#{cliente.tipoPessoa}" filterBy="#{cliente.tipoPessoa}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{cliente.tipoPessoa}"/>
+                        </p:column>
+                        <p:column headerText="Documento" style="width:15%"
+                                  sortBy="#{cliente.documento}" filterBy="#{cliente.documento}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{cliente.documento}"/>
+                        </p:column>
+                        <p:column headerText="Cidade" style="width:15%"
+                                  sortBy="#{cliente.endereco.cidade.nome}"
+                                  filterBy="#{cliente.endereco.cidade.nome}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{cliente.endereco.cidade.nome}"/>
+                        </p:column>
+                        <p:column headerText="Contato" style="width:30%"
+                                  sortBy="#{cliente.contato.contatoStr}"
+                                  filterBy="#{cliente.contato.contatoStr}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{cliente.contato.contatoStr}"/>
+                        </p:column>
+                        <p:column headerText="Opções" style="width:10%">
+                            <p:commandButton icon="pi pi-pencil"
+                                             styleClass="rounded-button ui-button-info ui-button-flat"
+
+                                             actionListener="#{clienteBean.editar}" update=":formCadastro">
+                                <f:attribute name="clienteSelecionado" value="#{cliente}"/>
+                                <f:actionListener
+                                        type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                            </p:commandButton>
+                            <p:commandButton icon="pi pi-trash"
+                                             styleClass="rounded-button ui-button-danger ui-button-flat"
+                                             actionListener="#{clienteBean.excluir}"
+
+                                             update=":mensagem :formCliente:tabela :formCadastro">
+                                <p:confirm header="Confirmação"
+                                           message="Deseja excluir o Cliente?" icon="ui-icon-alert"/>
+                                <f:attribute name="clienteSelecionado" value="#{cliente}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Sim" type="button"
+                                         styleClass="ui-confirmdialog-yes ui-button-outlined ui-button-danger"
+                                         icon="pi pi-check"
+                                         update=":mensagem :formCliente:tabela :formCadastro"/>
+                        <p:commandButton value="Não" type="button"
+                                         styleClass="ui-confirmdialog-no ui-button-outlined" icon="pi pi-times"/>
+                    </p:confirmDialog>
+                </p:panel>
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

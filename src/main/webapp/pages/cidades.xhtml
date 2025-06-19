@@ -1,0 +1,107 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+<body>
+<ui:composition
+        template="/templates/modelo.xhtml">
+
+    <ui:define name="conteudo">
+        <h:form id="formCadastro" >
+            <p:fieldset toggleable="true" toggleSpeed="750" legend="Cadastro"
+                        collapsed="#{cidadeBean.collapsed}">
+                <p:ajax event="toggle" listener="#{cidadeBean.novo}"
+                        update=":formCadastro">
+                    <f:actionListener
+                            type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                </p:ajax>
+                <p:panel>
+                    <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">                            <h:outputText value="Pais*" for="pais"/>
+                        <h:outputText value="Pais" for="comboPais"/>
+                        <p:selectOneMenu style="width: 100%" id="comboPais" value="#{cidadeBean.pais}"
+                                         converter="omnifaces.SelectItemsConverter" filter="true">
+                            <f:selectItem itemLabel="Selecione..." itemValue=""
+                                          noSelectionOption="true"/>
+                            <f:selectItems itemLabel="#{pais.nome}" itemValue="#{pais}"
+                                           value="#{cidadeBean.paises}" var="pais"/>
+                            <f:ajax event="itemSelect"
+                                    listener="#{cidadeBean.ajaxFiltraEstados}" render="comboEstado"/>
+                        </p:selectOneMenu>
+                        <h:outputText value="Estado" for="comboEstado"/>
+                        <p:selectOneMenu style="width: 100%" id="comboEstado"
+                                         disabled="#{cidadeBean.disEstado}"
+                                         value="#{cidadeBean.cidade.estado}" required="true"
+                                         requiredMessage="Selecione um Estado."
+                                         converter="omnifaces.SelectItemsConverter" filter="true">
+                            <f:selectItem itemLabel="Selecione..." itemValue=""
+                                          noSelectionOption="true"/>
+                            <f:selectItems itemLabel="#{estado.nome}" itemValue="#{estado}"
+                                           value="#{cidadeBean.estados}" var="estado"/>
+                        </p:selectOneMenu>
+                        <h:outputText value="Nome da cidade" for="nome"/>
+                        <p:inputText id="nome" value="#{cidadeBean.cidade.nome}"
+                                     required="true" requiredMessage="Insira o nome da cidade."
+                                     size="30" maxlength="30"/>
+                    </p:panelGrid>
+                    <f:facet name="footer">
+                        <p:commandButton value="Salvar" action="#{cidadeBean.salvar}"
+                                         update=":mensagem :formCidade:tabela :formCadastro"/>
+                    </f:facet>
+                </p:panel>
+            </p:fieldset>
+        </h:form>
+        <h:form id="formCidade" >
+            <p:panel header="Registro de Cidades">
+                <p:dataTable id="tabela" stripedRows="true" showGridlines="true" widgetVar="tabCidades"
+                             emptyMessage="Não há registros." paginator="true" rows="7"
+                             paginatorPosition="bottom" value="#{cidadeBean.cidades}"
+                             var="cidade">
+                    <f:facet name="header">
+                        <p:inputText id="globalFilter" placeholder="Pesquise..."
+                                     onkeyup="PF('tabCidades').filter()"/>
+                    </f:facet>
+                    <p:column headerText="Nome" style="width:30%"
+                              sortBy="#{cidade.nome}" filterBy="#{cidade.nome}"
+                              filterStyle="display:none">
+                        <h:outputText value="#{cidade.nome}"/>
+                    </p:column>
+                    <p:column headerText="Estado" style="width:30%"
+                              sortBy="#{cidade.estado.nome}" filterBy="#{cidade.estado.nome}"
+                              filterStyle="display:none">
+                        <h:outputText value="#{cidade.estado.nome}"/>
+                    </p:column>
+                    <p:column headerText="País" style="width:30%"
+                              sortBy="#{cidade.estado.pais.nome}"
+                              filterBy="#{cidade.estado.pais.nome}" filterStyle="display:none">
+                        <h:outputText value="#{cidade.estado.pais.nome}"/>
+                    </p:column>
+                    <p:column headerText="Opções" style="width:10%">
+                        <p:commandButton icon="pi pi-pencil" styleClass="rounded-button ui-button-info ui-button-flat"
+                                         actionListener="#{cidadeBean.editar}" update=":formCadastro">
+                            <f:attribute name="cidadeSelecionada" value="#{cidade}"/>
+                            <f:actionListener
+                                    type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                        </p:commandButton>
+                        <p:commandButton icon="pi pi-trash" styleClass="rounded-button ui-button-danger ui-button-flat"
+                                         actionListener="#{cidadeBean.excluir}"
+                                         update=":mensagem :formCidade:tabela :formCadastro">
+                            <p:confirm header="Confirmação"
+                                       message="Deseja excluir o Cidade?" icon="ui-icon-alert"/>
+                            <f:attribute name="cidadeSelecionada" value="#{cidade}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+                <p:confirmDialog global="true">
+                    <p:commandButton value="Sim" type="button"
+                                     styleClass="ui-confirmdialog-yes ui-button-outlined ui-button-danger" icon="pi pi-check"
+                                     update=":mensagem :formCidade:tabela :formCadastro"/>
+                    <p:commandButton value="Não" type="button"
+                                     styleClass="ui-confirmdialog-no ui-button-outlined" icon="pi pi-times"/>
+                </p:confirmDialog>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</body>
+</html>

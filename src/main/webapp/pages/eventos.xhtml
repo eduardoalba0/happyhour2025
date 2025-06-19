@@ -1,0 +1,236 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+
+      xmlns:ui="jakarta.faces.facelets">
+<h:body>
+    <ui:composition
+            template="/templates/modelo.xhtml">
+
+        <ui:define name="conteudo">
+            <h:form id="formCadastro"
+            >
+                <p:fieldset toggleable="true" toggleSpeed="750" legend="Cadastro"
+                            collapsed="#{eventoBean.collapsed}">
+                    <p:ajax event="toggle" listener="#{eventoBean.novo}"
+                            update=":formCadastro">
+                        <f:actionListener
+                                type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                    </p:ajax>
+                    <p:panel id="painelIdentificacao">
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6"> <h:outputText
+                                value="Descricao" for="descricao"/>
+                            <p:inputText id="descricao"
+                                         value="#{eventoBean.evento.descricao}" required="true"
+                                         requiredMessage="Insira o nome do evento." size="30"
+                                         maxlength="30">
+                            </p:inputText>
+                            <h:outputText value="Cliente" for="cliente"
+                                          rendered="#{!loginBean.cliente}"/>
+                            <p:selectOneMenu style="width: 100%" id="cliente" filter="true"
+                                             rendered="#{!loginBean.cliente}"
+                                             value="#{eventoBean.evento.cliente}"
+                                             converter="omnifaces.SelectItemsConverter" required="true"
+                                             requiredMessage="Selecione um cliente.">
+                                <f:selectItem itemLabel="Selecione um cliente." itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems itemLabel="#{cliente.nome}"
+                                               itemValue="#{cliente}" value="#{clienteBean.clientes}"
+                                               var="cliente"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Público" for="publico"/>
+                            <p:selectOneRadio id="publico" converter="jakarta.faces.Boolean"
+                                              value="#{eventoBean.evento.publico}" required="true"
+                                              requiredMessage="Informe se o evento é público.">
+                                <f:selectItem itemLabel="Sim" itemValue="#{true}"/>
+                                <f:selectItem itemLabel="Não" itemValue="#{false}"/>
+                            </p:selectOneRadio>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:panel id="painelGeral">
+
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6"> <h:outputText
+                                value="Local do evento" for="local"/>
+                            <p:selectOneMenu style="width: 100%" id="local" value="#{eventoBean.evento.local}"
+                                             converter="omnifaces.SelectItemsConverter" required="true"
+                                             requiredMessage="Selecione um Local.">
+                                <f:selectItem itemLabel="Selecione..." itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems itemLabel="#{local.descricaoLocal}"
+                                               itemValue="#{local}" value="#{localBean.locais}" var="local"/>
+                            </p:selectOneMenu>
+                            <h:outputText value="Data do evento" for="dataevt"/>
+                            <p:datePicker id="dataevt" value="#{eventoBean.evento.dataEvento}" pattern="dd/MM/yyyy HH:mm"
+                                          showIcon="true" showOnFocus="false" showTime="true" timeInput="true"  required="true"
+                                        requiredMessage="Informe a data." >
+                                <p:ajax event="dateSelect" />
+                            </p:datePicker>
+                            <h:outputText value="Duração (horas)" for="duracao"/>
+                            <p:inputText id="duracao" maxlength="2" size="2"
+                                         converter="jakarta.faces.Byte"
+                                         value="#{eventoBean.evento.duracao}" required="true"
+                                         requiredMessage="Informe a duração do evento.">
+                                <p:keyFilter regEx="/[0-9_]/i"/>
+                            </p:inputText>
+                        </p:panelGrid>
+                    </p:panel>
+                    <p:panel id="painelEntradas" style="width:100%; height:100%;">
+
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6"> <h:outputText
+                                value="Entrada" for="tipoentrada"/>
+                            <p:inputText id="tipoentrada"
+                                         value="#{eventoBean.entrada.descricao}" size="30"
+                                         maxlength="30"/>
+                            <h:outputText value="Valor" for="valorentrada"/>
+                            <p:inputNumber id="valorentrada"
+                                           value="#{eventoBean.entrada.valor}" maxlength="11" size="11"
+                                           emptyValue="0" decimalPlaces="2" decimalSeparator=","
+                                           thousandSeparator="." symbol="R$" placeholder="0"/>
+                            <p:commandButton icon="pi pi-plus"
+                                             action="#{eventoBean.addEntrada}"
+                                             update=":mensagem :formCadastro:painelEntradas :formCadastro:tabEntradas"/>
+                        </p:panelGrid>
+                        <p:dataTable id="tabEntradas" var="entrada"
+                                     value="#{eventoBean.evento.entradas}"
+                                     emptyMessage="Sem entradas." rows="5" paginator="true"
+                                     paginatorPosition="bottom">
+                            <p:column headerText="Entrada">
+                                <h:outputText value="#{entrada.descricao}"/>
+                            </p:column>
+                            <p:column headerText="Valor">
+                                <h:outputText value="R$ #{entrada.valor}"/>
+                            </p:column>
+                            <p:column headerText="Opções">
+                                <p:commandButton icon="pi pi-pencil"
+                                                 styleClass="rounded-button ui-button-info ui-button-flat"
+                                                 actionListener="#{eventoBean.editarEntrada}"
+                                                 update=":mensagem :formCadastro:painelEntradas">
+                                    <f:attribute name="entradaSelecionada" value="#{entrada}"/>
+                                </p:commandButton>
+                                <p:commandButton icon="pi pi-trash"
+                                                 styleClass="rounded-button ui-button-danger ui-button-flat"
+                                                 actionListener="#{eventoBean.excluirEntrada}"
+                                                 update=":formCadastro:painelEntradas :formCadastro:tabEntradas :formEvento:tabela">
+                                    <f:attribute name="entradaSelecionada" value="#{entrada}"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel id="painelServicos" style="width:100%; height:100%;">
+                        <p:panelGrid columns="2" layout="flex" columnClasses="col-6, col-6, col-6">                            <h:outputText value="Pais*" for="pais"/>
+                            <h:outputText value="Serviço" for="servico"/>
+                            <p:selectOneMenu style="width: 100%" id="servico" value="#{eventoBean.servico}"
+                                             converter="omnifaces.SelectItemsConverter" filter="true">
+                                <f:selectItem itemLabel="Selecione..." itemValue=""
+                                              noSelectionOption="true"/>
+                                <f:selectItems itemLabel="#{servico.descricao}"
+                                               itemValue="#{servico}" value="#{servicoBean.servicos}"
+                                               var="servico"/>
+                            </p:selectOneMenu>
+                            <p:commandButton icon="pi pi-plus"
+                                             action="#{eventoBean.addServico}"
+                                             update=":mensagem :formCadastro:painelServicos"/>
+                        </p:panelGrid>
+                        <p:dataTable id="tabServicos" var="servico"
+                                     widgetVar="tabServico" value="#{eventoBean.evento.servicos}"
+                                     emptyMessage="Sem entradas." rows="4" paginator="true"
+                                     paginatorPosition="bottom">
+                            <f:facet name="header">
+                                <p:inputText id="globalFilter" placeholder="Pesquise..."
+                                             onkeyup="PF('tabServico').filter()"/>
+                            </f:facet>
+                            <p:column headerText="Serviço" filterBy="#{servico.descricao}"
+                                      sortBy="#{servico.descricao}" filterStyle="display:none"
+                                      style="width:55%;">
+                                <h:outputText value="#{servico.descricao}"/>
+                            </p:column>
+                            <p:column headerText="Valor" filterBy="#{servico.valor}"
+                                      sortBy="#{servico.valor}" filterStyle="display:none"
+                                      style="width:25%;">
+                                <h:outputText value="R$ #{servico.valor}"/>
+                            </p:column>
+                            <p:column headerText="Opções" style="width:20%;">
+                                <p:commandButton icon="pi pi-trash"
+                                                 styleClass="rounded-button ui-button-danger ui-button-flat"
+                                                 actionListener="#{eventoBean.excluirServico}"
+                                                 update=":formCadastro:painelServicos">
+                                    <f:attribute name="servicoSelecionado" value="#{servico}"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:commandButton value="Salvar" actionListener="#{eventoBean.salvar}"
+                                     update=":mensagem :formEvento:tabela :formCadastro"
+                                     style="float:right; margin-top:2px;"/>
+                </p:fieldset>
+            </h:form>
+            <h:form id="formEvento">
+                <p:panel header="Registro de Eventos">
+                    <p:dataTable id="tabela" stripedRows="true" showGridlines="true" widgetVar="tabEventos"
+                                 emptyMessage="Não há registros." paginator="true" rows="7"
+                                 paginatorPosition="bottom" value="#{eventoBean.eventos}"
+                                 var="evento">
+                        <f:facet name="header">
+                            <p:inputText id="globalFilter" placeholder="Pesquise..."
+                                         onkeyup="PF('tabEventos').filter()"/>
+                        </f:facet>
+                        <p:column headerText="Descrição" style="width:28%"
+                                  sortBy="#{evento.descricao}" filterBy="#{evento.descricao}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{evento.descricao}"/>
+                        </p:column>
+                        <p:column headerText="Cliente" style="width:15%"
+                                  sortBy="#{evento.cliente.nome}" filterBy="#{evento.cliente.nome}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{evento.cliente.nome}"/>
+                        </p:column>
+                        <p:column headerText="Custo" style="width:10%"
+                                  sortBy="#{evento.custo}" filterBy="#{evento.custo}"
+                                  filterStyle="display:none">
+                            <h:outputText value="R$ #{evento.custo}"/>
+                        </p:column>
+                        <p:column headerText="Local" style="width:15%"
+                                  sortBy="#{evento.local.descricaoLocal}"
+                                  filterBy="#{evento.local.descricaoLocal}"
+                                  filterStyle="display:none">
+                            <h:outputText value="#{evento.local.descricaoLocal}"/>
+                        </p:column>
+                        <p:column headerText="Data" style="width:8%"
+                                  sortBy="#{evento.dataEventoStr}"
+                                  filterBy="#{evento.dataEventoStr}" filterStyle="display:none">
+                            <h:outputText value="#{evento.dataEventoStr}"/>
+                        </p:column>
+                        <p:column headerText="Opções" style="width:12%">
+                            <p:commandButton icon="pi pi-pencil"
+                                             styleClass="rounded-button ui-button-info ui-button-flat"
+                                             actionListener="#{eventoBean.editar}" update=":formCadastro"
+                                             >
+                                <f:attribute name="eventoSelecionado" value="#{evento}"/>
+                                <f:actionListener
+                                        type="org.omnifaces.eventlistener.ResetInputAjaxActionListener"/>
+                            </p:commandButton>
+                            <p:commandButton icon="pi pi-trash"
+                                             styleClass="rounded-button ui-button-danger ui-button-flat"
+                                             actionListener="#{eventoBean.excluir}"
+                                             update=":mensagem :formEvento:tabela :formCadastro">
+                                <p:confirm header="Confirmação"
+                                           message="Deseja excluir o Evento?" icon="ui-icon-alert"/>
+                                <f:attribute name="eventoSelecionado" value="#{evento}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Sim" type="button"
+                                         styleClass="ui-confirmdialog-yes ui-button-outlined ui-button-danger"
+                                         icon="pi pi-check"
+                                         update=":mensagem :formEvento:tabela :formCadastro"/>
+                        <p:commandButton value="Não" type="button"
+                                         styleClass="ui-confirmdialog-no ui-button-outlined" icon="pi pi-times"/>
+                    </p:confirmDialog>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

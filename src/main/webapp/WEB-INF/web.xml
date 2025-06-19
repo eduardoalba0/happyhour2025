@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+
+    <!-- Nome da Aplicação -->
+    <display-name>HappyHour</display-name>
+
+    <!-- JSF Servlet Configuration -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- O tipo de arquivo que será salvo as páginas -->
+    <!-- tem xhtml, jsp, ... depende muito do framework front -->
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+
+    <!-- Página inicial -->
+    <!-- Normalmente é uma página de login -->
+    <welcome-file-list>
+        <welcome-file>pages/index.xhtml</welcome-file>
+    </welcome-file-list>
+
+    <!-- Estágio do Projeto -->
+    <context-param>
+        <param-name>jakarta.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+
+    <!-- Escolha do tema -->
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>vela</param-value>
+    </context-param>
+
+    <mime-mapping>
+        <extension>xhtml</extension>
+        <mime-type>application/xhtml+xml</mime-type>
+    </mime-mapping>
+</web-app>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<!-- Configurações Básicas da Conexão -->
+		<property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+		<!-- MUAR PARA O NOME DO BANCO DE VCS-->
+		<property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/happyhour</property>
+		<property name="hibernate.connection.username">postgres</property>
+		<property name="hibernate.connection.password">admin</property>
+
+		<!-- Outras Configurações -->
+		<property name="hibernate.show_sql">false</property>
+		<property name="hibernate.format_sql">true</property>
+
+		<!-- Configuração de Criação do Banco de Dados -->
+		<property name="hbm2ddl.auto">update</property>
+		
+		<!-- Mapeamento das entidades -->
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Cidade"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Cliente"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Contato"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Convidado"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Endereco"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Entrada"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Estado"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Evento"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Local"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Pais"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Servico"/>
+		<mapping class="br.edu.ifpr.bsi.happyhour.model.Usuario"/>
+	</session-factory>
+</hibernate-configuration>
